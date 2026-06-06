@@ -5,7 +5,9 @@ from textual.screen import ModalScreen
 from textual.widgets import Input, Button, Label
 from textual.containers import Vertical
 from textual.containers import Horizontal
-from main import MusicSystem, Track
+from main import MusicSystem
+from track import Track
+from audio_analysis import build_similarity_graph
 class AddRelationScreen(ModalScreen):
     def compose(self):
         yield Vertical(
@@ -87,8 +89,9 @@ class MusicApp(App):
         ("r", "show_recommendations", "Recommend"),
         ("t", "load_test_tracks", "Load Tracks"),
         ("l", "load_test_relations", "Load Relations"),
+        ("o", "load_from_directory", "Load ~/Music"),
         ("q", "quit", "Quit"),
-        ("С", "clear", "Clear everything"),
+        ("k", "clear", "Clear everything"),
     ]
     def __init__(self):
         super().__init__()
@@ -201,6 +204,17 @@ class MusicApp(App):
     def action_load_test_relations(self):
         self.system.load_relations("testrelationts.txt")
         self.notify("Связи загружены из testrelations.txt")
+
+    def action_load_from_directory(self):
+        import os
+
+        path = os.path.expanduser("~/Music1")
+
+        loaded = self.system.load_from_directory(path)
+
+        self.notify(loaded)
+        self.load_tracks()
+        self.system.show_all_tracks()
     def relation_added(self, data):
         if data is None:
             return

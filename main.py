@@ -3,23 +3,9 @@ from hash_table import HashTable
 from sorting import quicksort
 from avl_tree import AVLTree
 from collections import deque
-class Track:
-    def __init__(self, track_id, title, artist, genre, duration, rating):
-        self.id = track_id
-        self.title = title
-        self.artist = artist
-        self.genre = genre
-        self.duration = duration
-        self.rating = rating
-
-    def __repr__(self):
-        return (
-            f"[{self.id}] "
-            f"{self.artist} - {self.title} | "
-            f"{self.genre} | "
-            f"{self.duration}s | "
-            f"rating={self.rating}"
-        )
+from audio_loader import scan_music_directory
+from track import Track
+from audio_analysis import build_similarity_graph
 
 def bfs_recommendations(graph, start, max_depth=2):
     visited = set()
@@ -73,6 +59,12 @@ class MusicSystem:
         self.tree.delete((track.rating, track.id))
         self.graph.remove_node(track_id)
         return True
+    def load_from_directory(self, directory: str):
+        loaded = scan_music_directory(directory,self)
+        build_similarity_graph(self)
+        with open("debug.log", "a", encoding="utf-8") as f:
+            f.write(f"Edges: {len(self.graph.edges)}\nNodes: {len(self.graph.nodes)}\n")
+        return (f"Загружено треков: {loaded}")
     def load_from_file(self, filename):
         try:
             loaded = 0
