@@ -61,7 +61,7 @@ class MusicSystem:
         return True
     def load_from_directory(self, directory: str):
         loaded = scan_music_directory(directory,self)
-        build_similarity_graph(self)
+        #build_similarity_graph(self)
         with open("debug.log", "a", encoding="utf-8") as f:
             f.write(f"Edges: {len(self.graph.edges)}\nNodes: {len(self.graph.nodes)}\n")
         return (f"Загружено треков: {loaded}")
