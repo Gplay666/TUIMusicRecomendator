@@ -102,6 +102,90 @@ class MusicSystem:
             print(f"\nЗагружено треков: {loaded}")
         except FileNotFoundError:
             return "Файл не найден"
+
+    def load_from_string(self, text):
+        loaded = 0
+
+        for line_number, line in enumerate(
+                text.splitlines(),
+                start=1
+        ):
+            line = line.strip()
+
+            if not line:
+                continue
+
+            parts = line.split("|")
+
+            if len(parts) != 6:
+                continue
+
+            try:
+                track = Track(
+                    parts[0],
+                    parts[1],
+                    parts[2],
+                    parts[3],
+                    int(parts[4]),
+                    int(parts[5])
+                )
+
+                self.add_track(track)
+                loaded += 1
+
+            except ValueError:
+                continue
+
+        return loaded
+
+    def load_relations_from_string(self, text):
+        loaded = 0
+
+        for line_number, line in enumerate(
+                text.splitlines(),
+                start=1
+        ):
+            line = line.strip()
+
+            if not line:
+                continue
+
+            parts = line.split("|")
+
+            if len(parts) < 2:
+                print(
+                    f"Ошибка в строке {line_number}: "
+                    f"неверный формат."
+                )
+                continue
+
+            a = parts[0]
+            b = parts[1]
+
+            weight = 1.0
+
+            if len(parts) >= 3 and parts[2]:
+                try:
+                    weight = float(parts[2])
+                except ValueError:
+                    print(
+                        f"Ошибка в строке {line_number}: "
+                        f"вес должен быть числом."
+                    )
+                    continue
+
+            if self.table.find(a) is None:
+                print(f"Трек {a} не найден.")
+                continue
+
+            if self.table.find(b) is None:
+                print(f"Трек {b} не найден.")
+                continue
+
+            self.add_relation(a, b, weight)
+            loaded += 1
+
+        return f"Загружено связей: {loaded}"
     def load_relations(self, filename):
         try:
             loaded = 0
